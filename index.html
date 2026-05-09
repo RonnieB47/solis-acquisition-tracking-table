@@ -9,63 +9,71 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --red:#C41E3A;
-    --red-dark:#8B1226;
-    --cream:#FAF7F2;
-    --bg:#141414;
-    --bg2:#1E1E1E;
-    --bg3:#242424;
-    --border:#2E2E2E;
-    --text:#FAF7F2;
-    --muted:#888;
-    --mono:'DM Mono',monospace;
-    --display:'Bebas Neue',sans-serif;
+    --red:#C41E3A;--red-dark:#8B1226;--cream:#FAF7F2;
+    --bg:#141414;--bg3:#242424;--border:#2E2E2E;
+    --muted:#888;--mono:'DM Mono',monospace;--display:'Bebas Neue',sans-serif;
   }
-  html,body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh}
+  html,body{background:var(--bg);color:var(--cream);font-family:var(--mono);min-height:100vh}
   body{padding:32px}
-
-  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;padding-bottom:20px;border-bottom:0.5px solid var(--border)}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:0.5px solid var(--border)}
   .logo-row{display:flex;align-items:center;gap:14px}
   .logo-img{width:42px;height:42px;border-radius:10px;object-fit:cover}
-  .logo-text .name{font-family:var(--display);font-size:22px;letter-spacing:0.06em;color:var(--cream);line-height:1}
+  .logo-text .name{font-family:var(--display);font-size:22px;letter-spacing:0.06em;line-height:1}
   .logo-text .hosted{font-size:10px;color:var(--muted);letter-spacing:0.12em;margin-top:3px}
-  .header-right{display:flex;align-items:center;gap:16px}
+  .header-right{display:flex;align-items:center;gap:10px}
   .month-badge{font-size:11px;color:var(--muted);letter-spacing:0.1em;border:0.5px solid var(--border);padding:6px 12px;border-radius:6px}
   .refresh-btn{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:all 0.2s}
   .refresh-btn:hover{border-color:var(--red);color:var(--red)}
-
+  .date-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:12px 16px}
+  .date-bar-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;white-space:nowrap}
+  .date-inputs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .date-inputs input[type=date]{background:#111;border:0.5px solid #3a3a3a;border-radius:6px;padding:6px 10px;color:var(--cream);font-size:11px;font-family:var(--mono);outline:none;transition:border-color 0.2s}
+  .date-inputs input[type=date]:focus{border-color:var(--red)}
+  .date-sep{font-size:11px;color:var(--muted)}
+  .date-apply{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:7px 14px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em}
+  .date-apply:hover{background:var(--red-dark)}
+  .date-reset{background:transparent;border:0.5px solid #3a3a3a;color:var(--muted);border-radius:6px;padding:7px 14px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em}
+  .date-reset:hover{color:var(--cream);border-color:#666}
+  .date-active-label{font-size:10px;color:var(--red);letter-spacing:0.06em}
+  .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .filter-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-right:4px}
+  .filter-btn{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:all 0.2s}
+  .filter-btn:hover{border-color:#555;color:var(--cream)}
+  .filter-btn.active{background:var(--red);border-color:var(--red);color:var(--cream)}
   .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-  .m-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s}
+  .m-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color 0.2s}
   .m-card:hover{border-color:#444}
   .m-card.accent{border-left:2px solid var(--red)}
   .m-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px}
   .m-val{font-family:var(--display);font-size:28px;letter-spacing:0.04em;color:var(--cream)}
   .m-val.red{color:var(--red)}
-
   .goal-bar-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px 22px;margin-bottom:14px}
   .goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   .goal-label{font-size:10px;color:var(--muted);letter-spacing:0.1em}
   .goal-figures{font-size:13px;color:var(--cream)}
-  .goal-figures span{color:var(--muted)}
   .bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
   .bar-fill{height:100%;background:var(--red);border-radius:4px;transition:width 1s ease}
   .goal-meta{display:flex;justify-content:space-between;margin-top:8px}
   .goal-pct{font-size:11px;color:var(--red);letter-spacing:0.06em}
   .goal-remaining{font-size:11px;color:var(--muted)}
-
+  .attribution-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+  .attr-title{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:16px}
+  .attr-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .attr-source{font-size:11px;color:var(--cream);min-width:90px;letter-spacing:0.06em}
+  .attr-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .attr-fill{height:100%;background:var(--red);border-radius:3px;transition:width 0.8s ease}
+  .attr-val{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
   .charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px}
   .chart-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px}
   .chart-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:16px}
   .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px}
   .leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);letter-spacing:0.06em}
   .leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-
   .deals-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px}
   .deals-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
   .deals-label{font-size:10px;color:var(--muted);letter-spacing:0.1em}
-  .log-btn{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:8px 16px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:background 0.2s}
+  .log-btn{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:8px 16px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em}
   .log-btn:hover{background:var(--red-dark)}
-
   .deals-table{width:100%;border-collapse:collapse;table-layout:fixed}
   .deals-table th{font-size:10px;color:#555;letter-spacing:0.08em;padding:0 0 12px;text-align:left;font-weight:400;border-bottom:0.5px solid var(--border)}
   .deals-table td{font-size:12px;color:#aaa;padding:11px 0;border-bottom:0.5px solid #1e1e1e;vertical-align:middle}
@@ -76,7 +84,7 @@
   .p-live{background:#2a1f0a;color:#EF9F27;border:0.5px solid #3d2e0e}
   .p-noshow{background:#2e0d0d;color:#E24B4A;border:0.5px solid #4a1414}
   .p-cancelled{background:#1e1e1e;color:#555;border:0.5px solid #2a2a2a}
-
+  .p-booked{background:#0a1a2e;color:#5B9FE4;border:0.5px solid #0e2a4a}
   .form-panel{background:#1a1a1a;border:0.5px solid var(--border);border-radius:8px;padding:20px;margin-top:14px;display:none}
   .form-panel.open{display:block}
   .form-title{font-size:12px;color:var(--cream);margin-bottom:16px;letter-spacing:0.06em}
@@ -88,25 +96,8 @@
   .ff select option{background:#111}
   .form-actions{display:flex;gap:8px}
   .btn-save{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:9px 18px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em}
-  .btn-save:hover{background:var(--red-dark)}
   .btn-cancel{background:transparent;color:var(--muted);border:0.5px solid #3a3a3a;border-radius:6px;padding:9px 18px;font-size:10px;cursor:pointer;font-family:var(--mono)}
-
-  .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-  .filter-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-right:4px}
-  .filter-btn{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:all 0.2s}
-  .filter-btn:hover{border-color:#555;color:var(--cream)}
-  .filter-btn.active{background:var(--red);border-color:var(--red);color:var(--cream)}
-  .attribution-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
-  .attr-title{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:16px}
-  .attr-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-  .attr-source{font-size:11px;color:var(--cream);min-width:90px;letter-spacing:0.06em}
-  .attr-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
-  .attr-fill{height:100%;background:var(--red);border-radius:3px;transition:width 0.8s ease}
-  .attr-val{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
-  .empty-row td{color:#444;font-size:12px;padding:24px 0 !important;text-align:center}
-  .loading{text-align:center;padding:60px 0;color:var(--muted);font-size:12px;letter-spacing:0.1em}
-  .error-msg{color:#E24B4A;font-size:11px;text-align:center;padding:40px 0;letter-spacing:0.06em}
-
+  .empty-row td{color:#444;font-size:12px;padding:24px 0!important;text-align:center}
   @media(max-width:900px){
     .metric-grid{grid-template-columns:repeat(2,1fr)}
     .charts-row{grid-template-columns:1fr}
@@ -131,6 +122,28 @@
   </div>
 </div>
 
+<div class="date-bar">
+  <span class="date-bar-label">DATE RANGE:</span>
+  <div class="date-inputs">
+    <input type="date" id="date-from" />
+    <span class="date-sep">→</span>
+    <input type="date" id="date-to" />
+    <button class="date-apply" onclick="applyDateFilter()">APPLY</button>
+    <button class="date-reset" onclick="resetDateFilter()">RESET</button>
+    <span class="date-active-label" id="date-active-label"></span>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">SOURCE:</span>
+  <button class="filter-btn active" onclick="setSourceFilter('all',this)">ALL</button>
+  <button class="filter-btn" onclick="setSourceFilter('Instagram',this)">INSTAGRAM</button>
+  <button class="filter-btn" onclick="setSourceFilter('TikTok',this)">TIKTOK</button>
+  <button class="filter-btn" onclick="setSourceFilter('YouTube',this)">YOUTUBE</button>
+  <button class="filter-btn" onclick="setSourceFilter('Referral',this)">REFERRAL</button>
+  <button class="filter-btn" onclick="setSourceFilter('Other',this)">OTHER</button>
+</div>
+
 <div class="metric-grid">
   <div class="m-card accent"><div class="m-label">TOTAL REVENUE</div><div class="m-val red" id="m-revenue">£0</div></div>
   <div class="m-card"><div class="m-label">CASH COLLECTED</div><div class="m-val" id="m-cash">£0</div></div>
@@ -148,7 +161,7 @@
 <div class="goal-bar-section">
   <div class="goal-top">
     <div class="goal-label">MONTHLY GOAL TRACKER</div>
-    <div class="goal-figures"><span id="g-cash">£0</span> of <span>£5,000</span></div>
+    <div class="goal-figures"><span id="g-cash">£0</span> of <span style="color:var(--muted)">£5,000</span></div>
   </div>
   <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
   <div class="goal-meta">
@@ -157,24 +170,16 @@
   </div>
 </div>
 
-<div class="filter-bar">
-  <span class="filter-label">FILTER BY SOURCE:</span>
-  <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
-  <button class="filter-btn" onclick="setFilter('Instagram',this)">INSTAGRAM</button>
-  <button class="filter-btn" onclick="setFilter('TikTok',this)">TIKTOK</button>
-  <button class="filter-btn" onclick="setFilter('YouTube',this)">YOUTUBE</button>
-  <button class="filter-btn" onclick="setFilter('Referral',this)">REFERRAL</button>
-  <button class="filter-btn" onclick="setFilter('Other',this)">OTHER</button>
-</div>
-
 <div class="attribution-section">
   <div class="attr-title">REVENUE BY SOURCE</div>
-  <div id="attr-rows"></div>
+  <div id="attr-rows"><div style="font-size:11px;color:#444">No closed deals yet.</div></div>
 </div>
+
+<div class="charts-row">
   <div class="chart-card">
-    <div class="chart-label">REVENUE BY WEEK — <span id="chart-month">THIS MONTH</span></div>
+    <div class="chart-label">REVENUE — <span id="chart-period">THIS MONTH</span></div>
     <div style="position:relative;height:200px">
-      <canvas id="revChart" role="img" aria-label="Weekly revenue bar chart">Weekly revenue breakdown.</canvas>
+      <canvas id="revChart"></canvas>
     </div>
   </div>
   <div class="chart-card">
@@ -186,7 +191,7 @@
       <span class="leg-item"><span class="leg-dot" style="background:#333"></span>CANCELLED</span>
     </div>
     <div style="position:relative;height:160px">
-      <canvas id="callChart" role="img" aria-label="Call outcomes doughnut chart">Call outcome breakdown.</canvas>
+      <canvas id="callChart"></canvas>
     </div>
   </div>
 </div>
@@ -196,7 +201,6 @@
     <div class="deals-label">DEALS LOG</div>
     <button class="log-btn" onclick="toggleForm()">+ LOG DEAL</button>
   </div>
-
   <div class="form-panel" id="form-panel">
     <div class="form-title">New entry</div>
     <div class="form-grid">
@@ -205,8 +209,9 @@
       <div class="ff"><label>DATE</label><input id="f-date" type="date" /></div>
       <div class="ff"><label>STATUS</label>
         <select id="f-status">
-          <option value="closed">Closed</option>
+          <option value="booked">Booked</option>
           <option value="live">Live call</option>
+          <option value="closed">Closed</option>
           <option value="noshow">No show</option>
           <option value="cancelled">Cancelled</option>
         </select>
@@ -232,145 +237,164 @@
       <div class="ff"><label>NOTES</label><input id="f-notes" placeholder="Optional" /></div>
     </div>
     <div class="form-actions">
-      <button class="btn-save" onclick="saveToSheet()">Save entry</button>
+      <button class="btn-save" onclick="saveEntry()">Save entry</button>
       <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
     </div>
-    <div id="save-msg" style="font-size:11px;color:#4CAF50;margin-top:10px;display:none;letter-spacing:0.06em">Entry saved to sheet.</div>
-    <div id="save-err" style="font-size:11px;color:#E24B4A;margin-top:10px;display:none;letter-spacing:0.06em">Could not save — check Sheet API access.</div>
+    <div id="save-msg" style="font-size:11px;color:#4CAF50;margin-top:10px;display:none;letter-spacing:0.06em">Entry saved.</div>
   </div>
-
   <table class="deals-table">
     <thead>
       <tr>
         <th style="width:20%">NAME</th>
-        <th style="width:14%">DATE</th>
-        <th style="width:16%">STATUS</th>
-        <th style="width:16%">OUTCOME</th>
-        <th style="width:14%">VALUE</th>
-        <th style="width:12%">SOURCE</th>
-        <th style="width:8%">NOTES</th>
+        <th style="width:13%">DATE</th>
+        <th style="width:14%">STATUS</th>
+        <th style="width:14%">OUTCOME</th>
+        <th style="width:13%">VALUE</th>
+        <th style="width:13%">SOURCE</th>
+        <th style="width:13%">NOTES</th>
       </tr>
     </thead>
     <tbody id="deals-body">
-      <tr class="empty-row"><td colspan="7">Loading data...</td></tr>
+      <tr class="empty-row"><td colspan="7">Loading...</td></tr>
     </tbody>
   </table>
 </div>
 
 <script>
-const SHEET_ID = '1b9aPI2w1M4zRHN7IdCLD7Anf-U731Tio2Yk-4C-He5E';
-const GOAL = 5000;
-let revChart, callChart;
-let allDeals = [];
-let activeFilter = 'all';
+const SHEET_ID='1b9aPI2w1M4zRHN7IdCLD7Anf-U731Tio2Yk-4C-He5E';
+const GOAL=5000;
+let revChart,callChart;
+let allDeals=[];
+let activeSource='all';
+let dateFrom=null,dateTo=null;
 
-function setFilter(source, btn){
-  activeFilter = source;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const filtered = activeFilter === 'all' ? allDeals : allDeals.filter(d => d.source === activeFilter);
-  renderMetricsFromDeals(filtered);
-  renderChartsFromDeals(filtered);
-  renderDealsFromData(filtered);
+function fmt(n){return'£'+Math.round(n).toLocaleString('en-GB')}
+
+function applyDateFilter(){
+  const f=document.getElementById('date-from').value;
+  const t=document.getElementById('date-to').value;
+  if(!f||!t){alert('Select both a from and to date.');return;}
+  dateFrom=new Date(f);
+  dateTo=new Date(t);
+  dateTo.setHours(23,59,59,999);
+  document.getElementById('date-active-label').textContent=`ACTIVE: ${f} → ${t}`;
+  document.getElementById('chart-period').textContent=`${f} → ${t}`;
+  applyFilters();
 }
 
-function fmt(n){ return '£' + Math.round(n).toLocaleString('en-GB'); }
+function resetDateFilter(){
+  dateFrom=null;dateTo=null;
+  document.getElementById('date-from').value='';
+  document.getElementById('date-to').value='';
+  document.getElementById('date-active-label').textContent='';
+  const now=new Date();
+  document.getElementById('chart-period').textContent=now.toLocaleString('en-GB',{month:'long'}).toUpperCase();
+  applyFilters();
+}
+
+function setSourceFilter(source,btn){
+  activeSource=source;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters(){
+  let deals=[...allDeals];
+  if(dateFrom&&dateTo){
+    deals=deals.filter(d=>{
+      const raw=d.dateClosed||d.apptDate;
+      if(!raw)return false;
+      const dd=new Date(raw);
+      return!isNaN(dd)&&dd>=dateFrom&&dd<=dateTo;
+    });
+  }
+  if(activeSource!=='all'){
+    deals=deals.filter(d=>d.source===activeSource);
+  }
+  renderMetricsFromDeals(deals);
+  renderChartsFromDeals(deals);
+  renderDealsFromData(deals);
+  renderAttribution(deals);
+}
 
 async function fetchData(){
-  try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Calls`;
-    const res = await fetch(url);
-    const text = await res.text();
-    const json = JSON.parse(text.substring(47).slice(0,-2));
-    const rows = json.table.rows;
+  try{
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Calls`;
+    const res=await fetch(url);
+    const text=await res.text();
+    const json=JSON.parse(text.substring(47).slice(0,-2));
+    const rows=json.table.rows||[];
+    allDeals=rows.map(r=>({
+      name:r.c[0]?.v||'',email:r.c[1]?.v||'',phone:r.c[2]?.v||'',
+      apptDate:r.c[3]?.v||'',status:(r.c[4]?.v||'').toLowerCase().trim(),
+      outcome:(r.c[5]?.v||'').toLowerCase().trim(),value:parseFloat(r.c[6]?.v)||0,
+      dateClosed:r.c[7]?.v||'',source:r.c[8]?.v||'',notes:r.c[9]?.v||''
+    })).filter(d=>d.name&&d.name.toString().trim().length>0&&d.name.toString().trim().toLowerCase()!=='lead name');
 
-    allDeals = rows.map(r => ({
-      name: r.c[0]?.v || '',
-      email: r.c[1]?.v || '',
-      phone: r.c[2]?.v || '',
-      apptDate: r.c[3]?.v || '',
-      status: (r.c[4]?.v || '').toLowerCase().trim(),
-      outcome: (r.c[5]?.v || '').toLowerCase().trim(),
-      value: parseFloat(r.c[6]?.v) || 0,
-      dateClosed: r.c[7]?.v || '',
-      source: r.c[8]?.v || '',
-      notes: r.c[9]?.v || ''
-    })).filter(d => d.name && d.name.toString().trim().length > 0 && d.name.toString().trim().toLowerCase() !== 'lead name');
+    const revUrl=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Revenue`;
+    const revRes=await fetch(revUrl);
+    const revText=await revRes.text();
+    const revJson=JSON.parse(revText.substring(47).slice(0,-2));
+    const revRows=revJson.table.rows||[];
+    const totalCash=revRows.reduce((s,r)=>s+(parseFloat(r.c[2]?.v)||0),0);
+    const totalFees=revRows.reduce((s,r)=>s+(parseFloat(r.c[4]?.v)||0),0);
+    const netCollected=revRows.reduce((s,r)=>s+(parseFloat(r.c[5]?.v)||0),0);
 
-    const revUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Revenue`;
-    const revRes = await fetch(revUrl);
-    const revText = await revRes.text();
-    const revJson = JSON.parse(revText.substring(47).slice(0,-2));
-    const revRows = revJson.table.rows;
-    const totalCash = revRows.reduce((s,r) => s + (parseFloat(r.c[2]?.v)||0), 0);
-    const totalFees = revRows.reduce((s,r) => s + (parseFloat(r.c[4]?.v)||0), 0);
-    const netCollected = revRows.reduce((s,r) => s + (parseFloat(r.c[5]?.v)||0), 0);
+    const now=new Date();
+    document.getElementById('month-badge').textContent=now.toLocaleString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
+    if(!dateFrom) document.getElementById('chart-period').textContent=now.toLocaleString('en-GB',{month:'long'}).toUpperCase();
+    document.getElementById('m-cash').textContent=fmt(totalCash);
+    document.getElementById('m-fees').textContent=fmt(netCollected||(totalCash-totalFees));
+    document.getElementById('g-cash').textContent=fmt(totalCash);
+    const gp=Math.min(Math.round(totalCash/GOAL*100),100);
+    document.getElementById('bar-fill').style.width=gp+'%';
+    document.getElementById('goal-pct').textContent=gp+'% to goal';
+    document.getElementById('goal-remaining').textContent=fmt(Math.max(GOAL-totalCash,0))+' remaining';
 
-    renderMetrics(totalCash, netCollected || (totalCash - totalFees));
-    const filtered = activeFilter === 'all' ? allDeals : allDeals.filter(d => d.source === activeFilter);
-    renderMetricsFromDeals(filtered);
-    renderChartsFromDeals(filtered);
-    renderDealsFromData(filtered);
-    renderAttribution();
-  } catch(e) {
-    document.getElementById('deals-body').innerHTML = '<tr class="empty-row"><td colspan="7" style="color:#E24B4A">Could not load sheet data. Check sharing settings.</td></tr>';
+    applyFilters();
+  }catch(e){
+    document.getElementById('deals-body').innerHTML='<tr class="empty-row"><td colspan="7" style="color:#E24B4A">Could not load data. Check Sheet sharing settings.</td></tr>';
   }
 }
 
 function renderMetricsFromDeals(deals){
-  const closed = deals.filter(d => d.outcome === 'closed');
-  const live = deals.filter(d => d.status === 'live');
-  const noshow = deals.filter(d => d.status === 'noshow');
-  const cancelled = deals.filter(d => d.status === 'cancelled');
-  const totalRev = closed.reduce((s,d) => s+d.value, 0);
-  const aov = closed.length ? Math.round(totalRev/closed.length) : 0;
-  const closeRate = (live.length+closed.length) > 0 ? Math.round(closed.length/(live.length+closed.length)*100) : 0;
-  const showRate = deals.length > 0 ? Math.round((deals.length-noshow.length-cancelled.length)/deals.length*100) : 0;
-  document.getElementById('m-revenue').textContent = fmt(totalRev);
-  document.getElementById('m-aov').textContent = fmt(aov);
-  document.getElementById('m-booked').textContent = deals.length;
-  document.getElementById('m-live').textContent = live.length;
-  document.getElementById('m-close').textContent = closeRate + '%';
-  document.getElementById('m-show').textContent = showRate + '%';
-}
-
-function renderMetrics(totalCash, netCollected){
-  const now = new Date();
-  document.getElementById('month-badge').textContent = now.toLocaleString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
-  document.getElementById('chart-month').textContent = now.toLocaleString('en-GB',{month:'long'}).toUpperCase();
-  const goalPct = Math.min(Math.round(totalCash/GOAL*100),100);
-  const remaining = Math.max(GOAL-totalCash,0);
-  document.getElementById('m-cash').textContent = fmt(totalCash);
-  document.getElementById('m-fees').textContent = fmt(netCollected);
-  document.getElementById('g-cash').textContent = fmt(totalCash);
-  document.getElementById('bar-fill').style.width = goalPct+'%';
-  document.getElementById('goal-pct').textContent = goalPct+'% to goal';
-  document.getElementById('goal-remaining').textContent = fmt(remaining)+' remaining';
+  const closed=deals.filter(d=>d.outcome==='closed');
+  const live=deals.filter(d=>d.status==='live');
+  const noshow=deals.filter(d=>d.status==='noshow');
+  const cancelled=deals.filter(d=>d.status==='cancelled');
+  const totalRev=closed.reduce((s,d)=>s+d.value,0);
+  const aov=closed.length?Math.round(totalRev/closed.length):0;
+  const closeRate=(live.length+closed.length)>0?Math.round(closed.length/(live.length+closed.length)*100):0;
+  const showRate=deals.length>0?Math.round((deals.length-noshow.length-cancelled.length)/deals.length*100):0;
+  document.getElementById('m-revenue').textContent=fmt(totalRev);
+  document.getElementById('m-aov').textContent=fmt(aov);
+  document.getElementById('m-booked').textContent=deals.length;
+  document.getElementById('m-live').textContent=live.length;
+  document.getElementById('m-close').textContent=closeRate+'%';
+  document.getElementById('m-show').textContent=showRate+'%';
 }
 
 function renderChartsFromDeals(deals){
-  const closed = deals.filter(d => d.outcome === 'closed');
-  const live = deals.filter(d => d.status === 'live');
-  const noshow = deals.filter(d => d.status === 'noshow');
-  const cancelled = deals.filter(d => d.status === 'cancelled');
-  const weekRev = [0,0,0,0];
-  closed.forEach(d => {
-    const raw = d.dateClosed || d.apptDate;
-    if(!raw) return;
-    const day = new Date(raw).getDate();
-    const w = Math.min(Math.floor((day-1)/7),3);
-    weekRev[w] += d.value;
+  const closed=deals.filter(d=>d.outcome==='closed');
+  const live=deals.filter(d=>d.status==='live');
+  const noshow=deals.filter(d=>d.status==='noshow');
+  const cancelled=deals.filter(d=>d.status==='cancelled');
+  const weekRev=[0,0,0,0];
+  closed.forEach(d=>{
+    const raw=d.dateClosed||d.apptDate;if(!raw)return;
+    weekRev[Math.min(Math.floor((new Date(raw).getDate()-1)/7),3)]+=d.value;
   });
-  if(revChart) revChart.destroy();
-  revChart = new Chart(document.getElementById('revChart'),{
+  if(revChart)revChart.destroy();
+  revChart=new Chart(document.getElementById('revChart'),{
     type:'bar',
     data:{labels:['Week 1','Week 2','Week 3','Week 4'],datasets:[{label:'Revenue',data:weekRev,backgroundColor:'#C41E3A',borderRadius:5,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#555',font:{size:10}},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#555',font:{size:10},callback:v=>'£'+v.toLocaleString('en-GB')},grid:{color:'#1e1e1e'}}}}
   });
   const totals=[closed.length,live.length,noshow.length,cancelled.length];
   const hasData=totals.some(v=>v>0);
-  if(callChart) callChart.destroy();
-  callChart = new Chart(document.getElementById('callChart'),{
+  if(callChart)callChart.destroy();
+  callChart=new Chart(document.getElementById('callChart'),{
     type:'doughnut',
     data:{labels:['Closed','Live','No show','Cancelled'],datasets:[{data:hasData?totals:[1,1,1,1],backgroundColor:hasData?['#C41E3A','#EF9F27','#E24B4A','#333']:['#222','#222','#222','#222'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
@@ -378,10 +402,10 @@ function renderChartsFromDeals(deals){
 }
 
 function renderDealsFromData(deals){
-  const tbody = document.getElementById('deals-body');
-  if(!deals.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="7">No deals logged yet.</td></tr>'; return; }
-  const pm={closed:'<span class="pill p-closed">CLOSED</span>',live:'<span class="pill p-live">LIVE</span>',noshow:'<span class="pill p-noshow">NO SHOW</span>',cancelled:'<span class="pill p-cancelled">CANCELLED</span>'};
-  tbody.innerHTML = deals.slice(0,30).map(d=>`
+  const tbody=document.getElementById('deals-body');
+  if(!deals.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">No deals in this range.</td></tr>';return;}
+  const pm={closed:'<span class="pill p-closed">CLOSED</span>',live:'<span class="pill p-live">LIVE</span>',noshow:'<span class="pill p-noshow">NO SHOW</span>',cancelled:'<span class="pill p-cancelled">CANCELLED</span>',booked:'<span class="pill p-booked">BOOKED</span>'};
+  tbody.innerHTML=deals.slice(0,50).map(d=>`
     <tr>
       <td class="name">${d.name}</td>
       <td>${d.dateClosed||d.apptDate||'—'}</td>
@@ -394,17 +418,17 @@ function renderDealsFromData(deals){
   `).join('');
 }
 
-function renderAttribution(){
+function renderAttribution(deals){
   const sources=['Instagram','TikTok','YouTube','Referral','Other'];
-  const closed=allDeals.filter(d=>d.outcome==='closed');
+  const closed=(deals||allDeals).filter(d=>d.outcome==='closed');
   const totalRev=closed.reduce((s,d)=>s+d.value,0);
   const container=document.getElementById('attr-rows');
   if(!totalRev){container.innerHTML='<div style="font-size:11px;color:#444">No closed deals yet.</div>';return;}
   container.innerHTML=sources.map(src=>{
     const srcRev=closed.filter(d=>d.source===src).reduce((s,d)=>s+d.value,0);
-    if(!srcRev) return '';
+    if(!srcRev)return'';
     const pct=Math.round(srcRev/totalRev*100);
-    return `<div class="attr-row"><div class="attr-source">${src.toUpperCase()}</div><div class="attr-track"><div class="attr-fill" style="width:${pct}%"></div></div><div class="attr-val">${fmt(srcRev)}</div></div>`;
+    return`<div class="attr-row"><div class="attr-source">${src.toUpperCase()}</div><div class="attr-track"><div class="attr-fill" style="width:${pct}%"></div></div><div class="attr-val">${fmt(srcRev)}</div></div>`;
   }).join('');
 }
 
@@ -414,42 +438,32 @@ function toggleForm(){
   if(p.classList.contains('open')){
     document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
     document.getElementById('save-msg').style.display='none';
-    document.getElementById('save-err').style.display='none';
   }
 }
 
-async function saveToSheet(){
+function saveEntry(){
   const name=document.getElementById('f-name').value.trim();
-  if(!name) return;
-  const row=[
-    name,
-    document.getElementById('f-email').value,
-    '',
-    document.getElementById('f-date').value,
-    document.getElementById('f-status').value,
-    document.getElementById('f-outcome').value,
-    parseFloat(document.getElementById('f-value').value)||0,
-    document.getElementById('f-date').value,
-    document.getElementById('f-source').value,
-    document.getElementById('f-notes').value
-  ];
+  if(!name)return;
   allDeals.unshift({
-    name:row[0],email:row[1],phone:'',apptDate:row[3],
-    status:row[4],outcome:row[5],value:row[6],
-    dateClosed:row[7],source:row[8],notes:row[9]
+    name,email:document.getElementById('f-email').value,phone:'',
+    apptDate:document.getElementById('f-date').value,
+    status:document.getElementById('f-status').value,
+    outcome:document.getElementById('f-outcome').value,
+    value:parseFloat(document.getElementById('f-value').value)||0,
+    dateClosed:document.getElementById('f-date').value,
+    source:document.getElementById('f-source').value,
+    notes:document.getElementById('f-notes').value
   });
-  renderDealsFromData(allDeals);
-  renderMetricsFromDeals(allDeals);
-  renderChartsFromDeals(allDeals);
+  applyFilters();
   document.getElementById('save-msg').style.display='block';
   document.getElementById('f-name').value='';
   document.getElementById('f-value').value='';
   document.getElementById('f-notes').value='';
-  setTimeout(()=>{ document.getElementById('save-msg').style.display='none'; },3000);
+  setTimeout(()=>{document.getElementById('save-msg').style.display='none';},3000);
 }
 
 fetchData();
-setInterval(fetchData, 60000);
+setInterval(fetchData,60000);
 </script>
 </body>
 </html>
