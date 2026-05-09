@@ -269,6 +269,7 @@ let activeSource='all';
 let dateFrom=null,dateTo=null;
 
 function fmt(n){return'£'+Math.round(n).toLocaleString('en-GB')}
+function fmtDate(str){if(!str)return'—';const d=new Date(str);if(isNaN(d))return str;return d.toLocaleDateString('en-GB')}
 
 function applyDateFilter(){
   const f=document.getElementById('date-from').value;
@@ -408,7 +409,7 @@ function renderDealsFromData(deals){
   tbody.innerHTML=deals.slice(0,50).map(d=>`
     <tr>
       <td class="name">${d.name}</td>
-      <td>${d.dateClosed||d.apptDate||'—'}</td>
+      <td>${fmtDate(d.dateClosed||d.apptDate)}</td>
       <td>${pm[d.status]||d.status||'—'}</td>
       <td style="color:#aaa;font-size:11px">${d.outcome||'—'}</td>
       <td style="color:var(--cream)">${d.value?fmt(d.value):'—'}</td>
