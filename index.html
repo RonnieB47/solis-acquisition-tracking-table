@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solis Acquisition — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --red:#C41E3A;
+    --red-dark:#8B1226;
+    --cream:#FAF7F2;
+    --bg:#141414;
+    --bg2:#1E1E1E;
+    --bg3:#242424;
+    --border:#2E2E2E;
+    --text:#FAF7F2;
+    --muted:#888;
+    --mono:'DM Mono',monospace;
+    --display:'Bebas Neue',sans-serif;
+  }
+  html,body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh}
+  body{padding:32px}
+
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;padding-bottom:20px;border-bottom:0.5px solid var(--border)}
+  .logo-row{display:flex;align-items:center;gap:14px}
+  .logo-img{width:42px;height:42px;border-radius:10px;object-fit:cover}
+  .logo-text .name{font-family:var(--display);font-size:22px;letter-spacing:0.06em;color:var(--cream);line-height:1}
+  .logo-text .hosted{font-size:10px;color:var(--muted);letter-spacing:0.12em;margin-top:3px}
+  .header-right{display:flex;align-items:center;gap:16px}
+  .month-badge{font-size:11px;color:var(--muted);letter-spacing:0.1em;border:0.5px solid var(--border);padding:6px 12px;border-radius:6px}
+  .refresh-btn{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:all 0.2s}
+  .refresh-btn:hover{border-color:var(--red);color:var(--red)}
+
+  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .m-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s}
+  .m-card:hover{border-color:#444}
+  .m-card.accent{border-left:2px solid var(--red)}
+  .m-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px}
+  .m-val{font-family:var(--display);font-size:28px;letter-spacing:0.04em;color:var(--cream)}
+  .m-val.red{color:var(--red)}
+
+  .goal-bar-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px 22px;margin-bottom:14px}
+  .goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .goal-label{font-size:10px;color:var(--muted);letter-spacing:0.1em}
+  .goal-figures{font-size:13px;color:var(--cream)}
+  .goal-figures span{color:var(--muted)}
+  .bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--red);border-radius:4px;transition:width 1s ease}
+  .goal-meta{display:flex;justify-content:space-between;margin-top:8px}
+  .goal-pct{font-size:11px;color:var(--red);letter-spacing:0.06em}
+  .goal-remaining{font-size:11px;color:var(--muted)}
+
+  .charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px}
+  .chart-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px}
+  .chart-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px}
+  .leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);letter-spacing:0.06em}
+  .leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+  .deals-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px}
+  .deals-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .deals-label{font-size:10px;color:var(--muted);letter-spacing:0.1em}
+  .log-btn{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:8px 16px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:background 0.2s}
+  .log-btn:hover{background:var(--red-dark)}
+
+  .deals-table{width:100%;border-collapse:collapse;table-layout:fixed}
+  .deals-table th{font-size:10px;color:#555;letter-spacing:0.08em;padding:0 0 12px;text-align:left;font-weight:400;border-bottom:0.5px solid var(--border)}
+  .deals-table td{font-size:12px;color:#aaa;padding:11px 0;border-bottom:0.5px solid #1e1e1e;vertical-align:middle}
+  .deals-table tr:last-child td{border-bottom:none}
+  .deals-table td.name{color:var(--cream);font-weight:500}
+  .pill{display:inline-block;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:0.08em}
+  .p-closed{background:#0d2e0d;color:#4CAF50;border:0.5px solid #1a4a1a}
+  .p-live{background:#2a1f0a;color:#EF9F27;border:0.5px solid #3d2e0e}
+  .p-noshow{background:#2e0d0d;color:#E24B4A;border:0.5px solid #4a1414}
+  .p-cancelled{background:#1e1e1e;color:#555;border:0.5px solid #2a2a2a}
+
+  .form-panel{background:#1a1a1a;border:0.5px solid var(--border);border-radius:8px;padding:20px;margin-top:14px;display:none}
+  .form-panel.open{display:block}
+  .form-title{font-size:12px;color:var(--cream);margin-bottom:16px;letter-spacing:0.06em}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+  .ff{display:flex;flex-direction:column;gap:5px}
+  .ff label{font-size:9px;color:var(--muted);letter-spacing:0.1em}
+  .ff input,.ff select{background:#111;border:0.5px solid #3a3a3a;border-radius:6px;padding:8px 10px;color:var(--cream);font-size:11px;font-family:var(--mono);outline:none;transition:border-color 0.2s}
+  .ff input:focus,.ff select:focus{border-color:var(--red)}
+  .ff select option{background:#111}
+  .form-actions{display:flex;gap:8px}
+  .btn-save{background:var(--red);color:var(--cream);border:none;border-radius:6px;padding:9px 18px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em}
+  .btn-save:hover{background:var(--red-dark)}
+  .btn-cancel{background:transparent;color:var(--muted);border:0.5px solid #3a3a3a;border-radius:6px;padding:9px 18px;font-size:10px;cursor:pointer;font-family:var(--mono)}
+
+  .empty-row td{color:#444;font-size:12px;padding:24px 0 !important;text-align:center}
+  .loading{text-align:center;padding:60px 0;color:var(--muted);font-size:12px;letter-spacing:0.1em}
+  .error-msg{color:#E24B4A;font-size:11px;text-align:center;padding:40px 0;letter-spacing:0.06em}
+
+  @media(max-width:900px){
+    .metric-grid{grid-template-columns:repeat(2,1fr)}
+    .charts-row{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:1fr 1fr}
+    body{padding:16px}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-row">
+    <img class="logo-img" src="solis-logo.png" alt="Solis" onerror="this.style.display='none'" />
+    <div class="logo-text">
+      <div class="name">SOLIS ACQUISITION</div>
+      <div class="hosted">METRICS DASHBOARD</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="month-badge" id="month-badge">—</div>
+    <button class="refresh-btn" onclick="fetchData()">↻ REFRESH</button>
+  </div>
+</div>
+
+<div class="metric-grid">
+  <div class="m-card accent"><div class="m-label">TOTAL REVENUE</div><div class="m-val red" id="m-revenue">£0</div></div>
+  <div class="m-card"><div class="m-label">CASH COLLECTED</div><div class="m-val" id="m-cash">£0</div></div>
+  <div class="m-card"><div class="m-label">CASH AFTER FEES</div><div class="m-val" id="m-fees">£0</div></div>
+  <div class="m-card"><div class="m-label">AVG ORDER VALUE</div><div class="m-val" id="m-aov">£0</div></div>
+</div>
+
+<div class="metric-grid">
+  <div class="m-card"><div class="m-label">CALLS BOOKED</div><div class="m-val" id="m-booked">0</div></div>
+  <div class="m-card"><div class="m-label">LIVE CALLS</div><div class="m-val" id="m-live">0</div></div>
+  <div class="m-card"><div class="m-label">CLOSE RATE</div><div class="m-val" id="m-close">0%</div></div>
+  <div class="m-card"><div class="m-label">SHOW RATE</div><div class="m-val" id="m-show">0%</div></div>
+</div>
+
+<div class="goal-bar-section">
+  <div class="goal-top">
+    <div class="goal-label">MONTHLY GOAL TRACKER</div>
+    <div class="goal-figures"><span id="g-cash">£0</span> of <span>£5,000</span></div>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+  <div class="goal-meta">
+    <div class="goal-pct" id="goal-pct">0% to goal</div>
+    <div class="goal-remaining" id="goal-remaining">£5,000 remaining</div>
+  </div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-label">REVENUE BY WEEK — <span id="chart-month">THIS MONTH</span></div>
+    <div style="position:relative;height:200px">
+      <canvas id="revChart" role="img" aria-label="Weekly revenue bar chart">Weekly revenue breakdown.</canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-label">CALL OUTCOMES</div>
+    <div class="legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#C41E3A"></span>CLOSED</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#EF9F27"></span>LIVE</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#E24B4A"></span>NO SHOW</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#333"></span>CANCELLED</span>
+    </div>
+    <div style="position:relative;height:160px">
+      <canvas id="callChart" role="img" aria-label="Call outcomes doughnut chart">Call outcome breakdown.</canvas>
+    </div>
+  </div>
+</div>
+
+<div class="deals-section">
+  <div class="deals-top">
+    <div class="deals-label">DEALS LOG</div>
+    <button class="log-btn" onclick="toggleForm()">+ LOG DEAL</button>
+  </div>
+
+  <div class="form-panel" id="form-panel">
+    <div class="form-title">New entry</div>
+    <div class="form-grid">
+      <div class="ff"><label>LEAD NAME</label><input id="f-name" placeholder="Full name" /></div>
+      <div class="ff"><label>EMAIL</label><input id="f-email" placeholder="email@example.com" /></div>
+      <div class="ff"><label>DATE</label><input id="f-date" type="date" /></div>
+      <div class="ff"><label>STATUS</label>
+        <select id="f-status">
+          <option value="closed">Closed</option>
+          <option value="live">Live call</option>
+          <option value="noshow">No show</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="ff"><label>CALL OUTCOME</label>
+        <select id="f-outcome">
+          <option value="closed">Closed</option>
+          <option value="not fit">Not fit</option>
+          <option value="nurture">Qualified — nurture</option>
+          <option value="">N/A</option>
+        </select>
+      </div>
+      <div class="ff"><label>DEAL VALUE (£)</label><input id="f-value" type="number" placeholder="0" /></div>
+      <div class="ff"><label>SOURCE</label>
+        <select id="f-source">
+          <option value="Instagram">Instagram</option>
+          <option value="TikTok">TikTok</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Referral">Referral</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="ff"><label>NOTES</label><input id="f-notes" placeholder="Optional" /></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveToSheet()">Save entry</button>
+      <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
+    </div>
+    <div id="save-msg" style="font-size:11px;color:#4CAF50;margin-top:10px;display:none;letter-spacing:0.06em">Entry saved to sheet.</div>
+    <div id="save-err" style="font-size:11px;color:#E24B4A;margin-top:10px;display:none;letter-spacing:0.06em">Could not save — check Sheet API access.</div>
+  </div>
+
+  <table class="deals-table">
+    <thead>
+      <tr>
+        <th style="width:20%">NAME</th>
+        <th style="width:14%">DATE</th>
+        <th style="width:16%">STATUS</th>
+        <th style="width:16%">OUTCOME</th>
+        <th style="width:14%">VALUE</th>
+        <th style="width:12%">SOURCE</th>
+        <th style="width:8%">NOTES</th>
+      </tr>
+    </thead>
+    <tbody id="deals-body">
+      <tr class="empty-row"><td colspan="7">Loading data...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+const SHEET_ID = '1b9aPI2w1M4zRHN7IdCLD7Anf-U731Tio2Yk-4C-He5E';
+const GOAL = 5000;
+let revChart, callChart;
+let allDeals = [];
+
+function fmt(n){ return '£' + Math.round(n).toLocaleString('en-GB'); }
+
+async function fetchData(){
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Calls`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.substring(47).slice(0,-2));
+    const rows = json.table.rows;
+
+    allDeals = rows.map(r => ({
+      name: r.c[0]?.v || '',
+      email: r.c[1]?.v || '',
+      phone: r.c[2]?.v || '',
+      apptDate: r.c[3]?.v || '',
+      status: (r.c[4]?.v || '').toLowerCase().trim(),
+      outcome: (r.c[5]?.v || '').toLowerCase().trim(),
+      value: parseFloat(r.c[6]?.v) || 0,
+      dateClosed: r.c[7]?.v || '',
+      source: r.c[8]?.v || '',
+      notes: r.c[9]?.v || ''
+    })).filter(d => d.name);
+
+    const revUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Revenue`;
+    const revRes = await fetch(revUrl);
+    const revText = await revRes.text();
+    const revJson = JSON.parse(revText.substring(47).slice(0,-2));
+    const revRows = revJson.table.rows;
+    const totalCash = revRows.reduce((s,r) => s + (parseFloat(r.c[2]?.v)||0), 0);
+    const totalFees = revRows.reduce((s,r) => s + (parseFloat(r.c[4]?.v)||0), 0);
+    const netCollected = revRows.reduce((s,r) => s + (parseFloat(r.c[5]?.v)||0), 0);
+
+    renderMetrics(totalCash, netCollected || (totalCash - totalFees));
+    renderDeals();
+    renderCharts();
+  } catch(e) {
+    document.getElementById('deals-body').innerHTML = '<tr class="empty-row"><td colspan="7" style="color:#E24B4A">Could not load sheet data. Check sharing settings.</td></tr>';
+  }
+}
+
+function renderMetrics(totalCash, netCollected){
+  const now = new Date();
+  document.getElementById('month-badge').textContent = now.toLocaleString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
+  document.getElementById('chart-month').textContent = now.toLocaleString('en-GB',{month:'long'}).toUpperCase();
+
+  const closed = allDeals.filter(d => d.outcome === 'closed');
+  const live = allDeals.filter(d => d.status === 'live');
+  const noshow = allDeals.filter(d => d.status === 'noshow');
+  const cancelled = allDeals.filter(d => d.status === 'cancelled');
+  const totalRev = closed.reduce((s,d) => s+d.value, 0);
+  const aov = closed.length ? Math.round(totalRev/closed.length) : 0;
+  const closeRate = (live.length+closed.length) > 0 ? Math.round(closed.length/(live.length+closed.length)*100) : 0;
+  const showRate = allDeals.length > 0 ? Math.round((allDeals.length-noshow.length-cancelled.length)/allDeals.length*100) : 0;
+  const goalPct = Math.min(Math.round(totalCash/GOAL*100),100);
+  const remaining = Math.max(GOAL - totalCash, 0);
+
+  document.getElementById('m-revenue').textContent = fmt(totalRev);
+  document.getElementById('m-cash').textContent = fmt(totalCash);
+  document.getElementById('m-fees').textContent = fmt(netCollected);
+  document.getElementById('m-aov').textContent = fmt(aov);
+  document.getElementById('m-booked').textContent = allDeals.length;
+  document.getElementById('m-live').textContent = live.length;
+  document.getElementById('m-close').textContent = closeRate + '%';
+  document.getElementById('m-show').textContent = showRate + '%';
+  document.getElementById('g-cash').textContent = fmt(totalCash);
+  document.getElementById('bar-fill').style.width = goalPct + '%';
+  document.getElementById('goal-pct').textContent = goalPct + '% to goal';
+  document.getElementById('goal-remaining').textContent = fmt(remaining) + ' remaining';
+}
+
+function renderCharts(){
+  const closed = allDeals.filter(d => d.outcome === 'closed');
+  const live = allDeals.filter(d => d.status === 'live');
+  const noshow = allDeals.filter(d => d.status === 'noshow');
+  const cancelled = allDeals.filter(d => d.status === 'cancelled');
+
+  const weekRev = [0,0,0,0];
+  closed.forEach(d => {
+    const raw = d.dateClosed || d.apptDate;
+    if(!raw) return;
+    const day = new Date(raw).getDate();
+    const w = Math.min(Math.floor((day-1)/7),3);
+    weekRev[w] += d.value;
+  });
+
+  if(revChart) revChart.destroy();
+  revChart = new Chart(document.getElementById('revChart'),{
+    type:'bar',
+    data:{
+      labels:['Week 1','Week 2','Week 3','Week 4'],
+      datasets:[{label:'Revenue',data:weekRev,backgroundColor:'#C41E3A',borderRadius:5,borderSkipped:false}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#555',font:{size:10},autoSkip:false},grid:{color:'#1e1e1e'}},
+        y:{ticks:{color:'#555',font:{size:10},callback:v=>'£'+v.toLocaleString('en-GB')},grid:{color:'#1e1e1e'}}
+      }
+    }
+  });
+
+  const totals = [closed.length,live.length,noshow.length,cancelled.length];
+  const hasData = totals.some(v=>v>0);
+  if(callChart) callChart.destroy();
+  callChart = new Chart(document.getElementById('callChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Closed','Live','No show','Cancelled'],
+      datasets:[{
+        data:hasData?totals:[1,1,1,1],
+        backgroundColor:hasData?['#C41E3A','#EF9F27','#E24B4A','#333']:['#222','#222','#222','#222'],
+        borderWidth:0,hoverOffset:4
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
+  });
+}
+
+function renderDeals(){
+  const tbody = document.getElementById('deals-body');
+  if(!allDeals.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="7">No deals logged yet.</td></tr>';
+    return;
+  }
+  const pm={closed:'<span class="pill p-closed">CLOSED</span>',live:'<span class="pill p-live">LIVE</span>',noshow:'<span class="pill p-noshow">NO SHOW</span>',cancelled:'<span class="pill p-cancelled">CANCELLED</span>'};
+  tbody.innerHTML = allDeals.slice(0,30).map(d=>`
+    <tr>
+      <td class="name">${d.name}</td>
+      <td>${d.dateClosed||d.apptDate||'—'}</td>
+      <td>${pm[d.status]||d.status||'—'}</td>
+      <td style="color:#aaa;font-size:11px">${d.outcome||'—'}</td>
+      <td style="color:var(--cream)">${d.value?fmt(d.value):'—'}</td>
+      <td style="color:var(--muted)">${d.source||'—'}</td>
+      <td style="color:var(--muted);font-size:11px">${d.notes||'—'}</td>
+    </tr>
+  `).join('');
+}
+
+function toggleForm(){
+  const p=document.getElementById('form-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){
+    document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('save-msg').style.display='none';
+    document.getElementById('save-err').style.display='none';
+  }
+}
+
+async function saveToSheet(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name) return;
+  const row=[
+    name,
+    document.getElementById('f-email').value,
+    '',
+    document.getElementById('f-date').value,
+    document.getElementById('f-status').value,
+    document.getElementById('f-outcome').value,
+    parseFloat(document.getElementById('f-value').value)||0,
+    document.getElementById('f-date').value,
+    document.getElementById('f-source').value,
+    document.getElementById('f-notes').value
+  ];
+  allDeals.unshift({
+    name:row[0],email:row[1],phone:'',apptDate:row[3],
+    status:row[4],outcome:row[5],value:row[6],
+    dateClosed:row[7],source:row[8],notes:row[9]
+  });
+  renderDeals();
+  renderMetrics(0,0);
+  renderCharts();
+  document.getElementById('save-msg').style.display='block';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-value').value='';
+  document.getElementById('f-notes').value='';
+  setTimeout(()=>{ document.getElementById('save-msg').style.display='none'; },3000);
+}
+
+fetchData();
+setInterval(fetchData, 60000);
+</script>
+</body>
+</html>
