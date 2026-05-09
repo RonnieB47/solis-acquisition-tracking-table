@@ -91,6 +91,18 @@
   .btn-save:hover{background:var(--red-dark)}
   .btn-cancel{background:transparent;color:var(--muted);border:0.5px solid #3a3a3a;border-radius:6px;padding:9px 18px;font-size:10px;cursor:pointer;font-family:var(--mono)}
 
+  .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .filter-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-right:4px}
+  .filter-btn{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:10px;font-family:var(--mono);cursor:pointer;letter-spacing:0.08em;transition:all 0.2s}
+  .filter-btn:hover{border-color:#555;color:var(--cream)}
+  .filter-btn.active{background:var(--red);border-color:var(--red);color:var(--cream)}
+  .attribution-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+  .attr-title{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:16px}
+  .attr-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .attr-source{font-size:11px;color:var(--cream);min-width:90px;letter-spacing:0.06em}
+  .attr-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .attr-fill{height:100%;background:var(--red);border-radius:3px;transition:width 0.8s ease}
+  .attr-val{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
   .empty-row td{color:#444;font-size:12px;padding:24px 0 !important;text-align:center}
   .loading{text-align:center;padding:60px 0;color:var(--muted);font-size:12px;letter-spacing:0.1em}
   .error-msg{color:#E24B4A;font-size:11px;text-align:center;padding:40px 0;letter-spacing:0.06em}
@@ -145,7 +157,20 @@
   </div>
 </div>
 
-<div class="charts-row">
+<div class="filter-bar">
+  <span class="filter-label">FILTER BY SOURCE:</span>
+  <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
+  <button class="filter-btn" onclick="setFilter('Instagram',this)">INSTAGRAM</button>
+  <button class="filter-btn" onclick="setFilter('TikTok',this)">TIKTOK</button>
+  <button class="filter-btn" onclick="setFilter('YouTube',this)">YOUTUBE</button>
+  <button class="filter-btn" onclick="setFilter('Referral',this)">REFERRAL</button>
+  <button class="filter-btn" onclick="setFilter('Other',this)">OTHER</button>
+</div>
+
+<div class="attribution-section">
+  <div class="attr-title">REVENUE BY SOURCE</div>
+  <div id="attr-rows"></div>
+</div>
   <div class="chart-card">
     <div class="chart-label">REVENUE BY WEEK — <span id="chart-month">THIS MONTH</span></div>
     <div style="position:relative;height:200px">
@@ -237,6 +262,17 @@ const SHEET_ID = '1b9aPI2w1M4zRHN7IdCLD7Anf-U731Tio2Yk-4C-He5E';
 const GOAL = 5000;
 let revChart, callChart;
 let allDeals = [];
+let activeFilter = 'all';
+
+function setFilter(source, btn){
+  activeFilter = source;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = activeFilter === 'all' ? allDeals : allDeals.filter(d => d.source === activeFilter);
+  renderMetricsFromDeals(filtered);
+  renderChartsFromDeals(filtered);
+  renderDealsFromData(filtered);
+}
 
 function fmt(n){ return '£' + Math.round(n).toLocaleString('en-GB'); }
 
@@ -271,49 +307,52 @@ async function fetchData(){
     const netCollected = revRows.reduce((s,r) => s + (parseFloat(r.c[5]?.v)||0), 0);
 
     renderMetrics(totalCash, netCollected || (totalCash - totalFees));
-    renderDeals();
-    renderCharts();
+    const filtered = activeFilter === 'all' ? allDeals : allDeals.filter(d => d.source === activeFilter);
+    renderMetricsFromDeals(filtered);
+    renderChartsFromDeals(filtered);
+    renderDealsFromData(filtered);
+    renderAttribution();
   } catch(e) {
     document.getElementById('deals-body').innerHTML = '<tr class="empty-row"><td colspan="7" style="color:#E24B4A">Could not load sheet data. Check sharing settings.</td></tr>';
   }
+}
+
+function renderMetricsFromDeals(deals){
+  const closed = deals.filter(d => d.outcome === 'closed');
+  const live = deals.filter(d => d.status === 'live');
+  const noshow = deals.filter(d => d.status === 'noshow');
+  const cancelled = deals.filter(d => d.status === 'cancelled');
+  const totalRev = closed.reduce((s,d) => s+d.value, 0);
+  const aov = closed.length ? Math.round(totalRev/closed.length) : 0;
+  const closeRate = (live.length+closed.length) > 0 ? Math.round(closed.length/(live.length+closed.length)*100) : 0;
+  const showRate = deals.length > 0 ? Math.round((deals.length-noshow.length-cancelled.length)/deals.length*100) : 0;
+  document.getElementById('m-revenue').textContent = fmt(totalRev);
+  document.getElementById('m-aov').textContent = fmt(aov);
+  document.getElementById('m-booked').textContent = deals.length;
+  document.getElementById('m-live').textContent = live.length;
+  document.getElementById('m-close').textContent = closeRate + '%';
+  document.getElementById('m-show').textContent = showRate + '%';
 }
 
 function renderMetrics(totalCash, netCollected){
   const now = new Date();
   document.getElementById('month-badge').textContent = now.toLocaleString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
   document.getElementById('chart-month').textContent = now.toLocaleString('en-GB',{month:'long'}).toUpperCase();
-
-  const closed = allDeals.filter(d => d.outcome === 'closed');
-  const live = allDeals.filter(d => d.status === 'live');
-  const noshow = allDeals.filter(d => d.status === 'noshow');
-  const cancelled = allDeals.filter(d => d.status === 'cancelled');
-  const totalRev = closed.reduce((s,d) => s+d.value, 0);
-  const aov = closed.length ? Math.round(totalRev/closed.length) : 0;
-  const closeRate = (live.length+closed.length) > 0 ? Math.round(closed.length/(live.length+closed.length)*100) : 0;
-  const showRate = allDeals.length > 0 ? Math.round((allDeals.length-noshow.length-cancelled.length)/allDeals.length*100) : 0;
   const goalPct = Math.min(Math.round(totalCash/GOAL*100),100);
-  const remaining = Math.max(GOAL - totalCash, 0);
-
-  document.getElementById('m-revenue').textContent = fmt(totalRev);
+  const remaining = Math.max(GOAL-totalCash,0);
   document.getElementById('m-cash').textContent = fmt(totalCash);
   document.getElementById('m-fees').textContent = fmt(netCollected);
-  document.getElementById('m-aov').textContent = fmt(aov);
-  document.getElementById('m-booked').textContent = allDeals.length;
-  document.getElementById('m-live').textContent = live.length;
-  document.getElementById('m-close').textContent = closeRate + '%';
-  document.getElementById('m-show').textContent = showRate + '%';
   document.getElementById('g-cash').textContent = fmt(totalCash);
-  document.getElementById('bar-fill').style.width = goalPct + '%';
-  document.getElementById('goal-pct').textContent = goalPct + '% to goal';
-  document.getElementById('goal-remaining').textContent = fmt(remaining) + ' remaining';
+  document.getElementById('bar-fill').style.width = goalPct+'%';
+  document.getElementById('goal-pct').textContent = goalPct+'% to goal';
+  document.getElementById('goal-remaining').textContent = fmt(remaining)+' remaining';
 }
 
-function renderCharts(){
-  const closed = allDeals.filter(d => d.outcome === 'closed');
-  const live = allDeals.filter(d => d.status === 'live');
-  const noshow = allDeals.filter(d => d.status === 'noshow');
-  const cancelled = allDeals.filter(d => d.status === 'cancelled');
-
+function renderChartsFromDeals(deals){
+  const closed = deals.filter(d => d.outcome === 'closed');
+  const live = deals.filter(d => d.status === 'live');
+  const noshow = deals.filter(d => d.status === 'noshow');
+  const cancelled = deals.filter(d => d.status === 'cancelled');
   const weekRev = [0,0,0,0];
   closed.forEach(d => {
     const raw = d.dateClosed || d.apptDate;
@@ -322,49 +361,27 @@ function renderCharts(){
     const w = Math.min(Math.floor((day-1)/7),3);
     weekRev[w] += d.value;
   });
-
   if(revChart) revChart.destroy();
   revChart = new Chart(document.getElementById('revChart'),{
     type:'bar',
-    data:{
-      labels:['Week 1','Week 2','Week 3','Week 4'],
-      datasets:[{label:'Revenue',data:weekRev,backgroundColor:'#C41E3A',borderRadius:5,borderSkipped:false}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:'#555',font:{size:10},autoSkip:false},grid:{color:'#1e1e1e'}},
-        y:{ticks:{color:'#555',font:{size:10},callback:v=>'£'+v.toLocaleString('en-GB')},grid:{color:'#1e1e1e'}}
-      }
-    }
+    data:{labels:['Week 1','Week 2','Week 3','Week 4'],datasets:[{label:'Revenue',data:weekRev,backgroundColor:'#C41E3A',borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#555',font:{size:10}},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#555',font:{size:10},callback:v=>'£'+v.toLocaleString('en-GB')},grid:{color:'#1e1e1e'}}}}
   });
-
-  const totals = [closed.length,live.length,noshow.length,cancelled.length];
-  const hasData = totals.some(v=>v>0);
+  const totals=[closed.length,live.length,noshow.length,cancelled.length];
+  const hasData=totals.some(v=>v>0);
   if(callChart) callChart.destroy();
   callChart = new Chart(document.getElementById('callChart'),{
     type:'doughnut',
-    data:{
-      labels:['Closed','Live','No show','Cancelled'],
-      datasets:[{
-        data:hasData?totals:[1,1,1,1],
-        backgroundColor:hasData?['#C41E3A','#EF9F27','#E24B4A','#333']:['#222','#222','#222','#222'],
-        borderWidth:0,hoverOffset:4
-      }]
-    },
+    data:{labels:['Closed','Live','No show','Cancelled'],datasets:[{data:hasData?totals:[1,1,1,1],backgroundColor:hasData?['#C41E3A','#EF9F27','#E24B4A','#333']:['#222','#222','#222','#222'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
 }
 
-function renderDeals(){
+function renderDealsFromData(deals){
   const tbody = document.getElementById('deals-body');
-  if(!allDeals.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="7">No deals logged yet.</td></tr>';
-    return;
-  }
+  if(!deals.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="7">No deals logged yet.</td></tr>'; return; }
   const pm={closed:'<span class="pill p-closed">CLOSED</span>',live:'<span class="pill p-live">LIVE</span>',noshow:'<span class="pill p-noshow">NO SHOW</span>',cancelled:'<span class="pill p-cancelled">CANCELLED</span>'};
-  tbody.innerHTML = allDeals.slice(0,30).map(d=>`
+  tbody.innerHTML = deals.slice(0,30).map(d=>`
     <tr>
       <td class="name">${d.name}</td>
       <td>${d.dateClosed||d.apptDate||'—'}</td>
@@ -375,6 +392,20 @@ function renderDeals(){
       <td style="color:var(--muted);font-size:11px">${d.notes||'—'}</td>
     </tr>
   `).join('');
+}
+
+function renderAttribution(){
+  const sources=['Instagram','TikTok','YouTube','Referral','Other'];
+  const closed=allDeals.filter(d=>d.outcome==='closed');
+  const totalRev=closed.reduce((s,d)=>s+d.value,0);
+  const container=document.getElementById('attr-rows');
+  if(!totalRev){container.innerHTML='<div style="font-size:11px;color:#444">No closed deals yet.</div>';return;}
+  container.innerHTML=sources.map(src=>{
+    const srcRev=closed.filter(d=>d.source===src).reduce((s,d)=>s+d.value,0);
+    if(!srcRev) return '';
+    const pct=Math.round(srcRev/totalRev*100);
+    return `<div class="attr-row"><div class="attr-source">${src.toUpperCase()}</div><div class="attr-track"><div class="attr-fill" style="width:${pct}%"></div></div><div class="attr-val">${fmt(srcRev)}</div></div>`;
+  }).join('');
 }
 
 function toggleForm(){
@@ -407,9 +438,9 @@ async function saveToSheet(){
     status:row[4],outcome:row[5],value:row[6],
     dateClosed:row[7],source:row[8],notes:row[9]
   });
-  renderDeals();
-  renderMetrics(0,0);
-  renderCharts();
+  renderDealsFromData(allDeals);
+  renderMetricsFromDeals(allDeals);
+  renderChartsFromDeals(allDeals);
   document.getElementById('save-msg').style.display='block';
   document.getElementById('f-name').value='';
   document.getElementById('f-value').value='';
