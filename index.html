@@ -259,7 +259,7 @@ async function fetchData(){
       dateClosed: r.c[7]?.v || '',
       source: r.c[8]?.v || '',
       notes: r.c[9]?.v || ''
-    })).filter(d => d.name);
+    })).filter(d => d.name && d.name.toString().trim().length > 0 && d.name.toString().trim().toLowerCase() !== 'lead name');
 
     const revUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Revenue`;
     const revRes = await fetch(revUrl);
